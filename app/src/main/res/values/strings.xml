@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">JcDemo 3.2.2</string>
+    <string name="single_page_print">单页打印</string>
+    <string name="connect">连接打印机</string>
+    <string name="search">搜索</string>
+    <string name="no_bond">未配对</string>
+    <string name="address">TextView</string>
+    <string name="name">TextView</string>
+    <string name="connecting">连接中</string>
+    <string name="multiple_page_print">多页打印</string>
+    <string name="thermal">热敏</string>
+    <string name="thermal_transfer">热转印</string>
+    <string name="print_mode">打印模式:</string>
+    <string name="connected_printer">已连接打印机</string>
+    <string name="available_printer">可用打印机:</string>
+    <string name="image_print">图片打印（Base64）</string>
+    <string name="bitmap_print">提交数据打印（小票）</string>
+    <string name="model_restrictions">机型限制</string>
+    <string name="all">All</string>
+    <string name="input_model">输入机型</string>
+    <string name="input">输入</string>
+    <string name="z401">Z401</string>
+    <string name="b21">B21</string>
+    <string name="b3s">B3S</string>
+    <string name="niimbot_sdk_demo">精臣SDK示例</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="k3w">K3_W</string>
+    <string name="wifi_configure">wifi配置</string>
+    <string name="wifi_name">Wifi名称</string>
+    <string name="wifi_password">wifi密码</string>
+    <string name="input_wifi_name">请输入wifi名称</string>
+    <string name="input_wifi_password">请输入wifi密码</string>
+    <string name="no_connect">未连接</string>
+</resources>
