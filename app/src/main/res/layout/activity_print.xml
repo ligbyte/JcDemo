@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.PrintActivity">
+
+
+    <RelativeLayout
+        android:background="@color/purple_700"
+        android:id="@+id/rl"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp54"
+        tools:ignore="MissingConstraints">
+
+
+
+
+        <TextView
+            android:textSize="@dimen/sp16"
+            android:textColor="@color/white"
+            android:text="@string/niimbot_sdk_demo"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+    </RelativeLayout>
+
+
+    <Button
+        android:id="@+id/btn_bitmap_print"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/bitmap_print"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_centerInParent="true" />
+
+
+</RelativeLayout>

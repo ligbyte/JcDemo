@@ -1,15 +1,16 @@
 package com.niimbot.jcdemo.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 
+import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.niimbot.jcdemo.R;
 import com.niimbot.jcdemo.adapter.ConnectAdapter;
-import com.niimbot.jcdemo.databinding.ActivityConnectBinding;
-import com.niimbot.jcdemo.fragment.BluetoothConnectFragment;
-import com.niimbot.jcdemo.fragment.WifiConnectFragment;
 
 /**
  * 设备连接
@@ -20,14 +21,15 @@ import com.niimbot.jcdemo.fragment.WifiConnectFragment;
 public class ConnectActivity extends AppCompatActivity  {
     private static final String TAG = "ConnectActivity";
 
-    private ActivityConnectBinding bind;
+    private ViewPager2 viewPager;
+    private TabLayout tabs;
+    private ImageView ivBack;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        bind = ActivityConnectBinding.inflate(getLayoutInflater());
-        setContentView(bind.getRoot());
+        setContentView(R.layout.activity_connect);
         init();
     }
 
@@ -35,15 +37,19 @@ public class ConnectActivity extends AppCompatActivity  {
 
 
     private void init() {
+
+        viewPager = findViewById(R.id.view_pager);
+        tabs = findViewById(R.id.tabs);
+        ivBack = findViewById(R.id.iv_back);
         ConnectAdapter connectAdapter = new ConnectAdapter(this);
-        bind.viewPager.setAdapter(connectAdapter);
-        new TabLayoutMediator(bind.tabs, bind.viewPager, (tab, position) -> {
+        viewPager.setAdapter(connectAdapter);
+        new TabLayoutMediator(tabs, viewPager, (tab, position) -> {
             Log.d(TAG, "武汉: " + position);
             tab.setText(position == 0 ? "蓝牙" : "wifi");
 
         }).attach();
 
-        bind.ivBack.setOnClickListener(v -> finish());
+        ivBack.setOnClickListener(v -> finish());
     }
 
     @Override

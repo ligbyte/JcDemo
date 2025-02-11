@@ -14,12 +14,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -27,14 +21,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.github.ybq.android.spinkit.SpinKitView;
 import com.niimbot.jcdemo.Constant;
 import com.niimbot.jcdemo.R;
 import com.niimbot.jcdemo.adapter.BlueDeviceAdapter;
 import com.niimbot.jcdemo.app.MyApplication;
 import com.niimbot.jcdemo.bean.BlueDeviceInfo;
-import com.niimbot.jcdemo.databinding.FragmentBluetoothConnectBinding;
 import com.niimbot.jcdemo.ui.MyDialogFragment;
 import com.niimbot.jcdemo.ui.MyDialogLoadingFragment;
 import com.niimbot.jcdemo.ui.MyDialogWifiSetFragment;
@@ -54,10 +57,9 @@ import java.util.concurrent.TimeUnit;
 
 
 public class BluetoothConnectFragment extends Fragment {
-    private FragmentBluetoothConnectBinding bind;
     private Context context;
     private static final String USER_DEFINED = "自定义";
-    private static final String TAG = "BluetoothConnectFragment";
+    private static final String TAG = "limeBluetoothConnectFragment";
     private ExecutorService executorService;
     private BluetoothAdapter mBluetoothAdapter;
     private Set<String> deviceList;
@@ -70,10 +72,26 @@ public class BluetoothConnectFragment extends Fragment {
     private BlueDeviceAdapter.OnItemClickListener itemClickListener;
     private int itemPosition;
     private BlueDeviceInfo lastConnectedDevice;
+
+
+    private SpinKitView spinKit;
+    private RecyclerView rvDeviceList;
+    private TextView tvConnected;
+    private TextView tvName;
+    private TextView tvAddress;
+    private TextView tvStatus;
+
+    private TextView tvWifiConfigure;
+    private ConstraintLayout clConnected;
+
+    private ConstraintLayout clSearch;
+
+    private EditText etModel;
+
     /**
      * 打印机过滤
      */
-    private String printNameStart = "";
+    private String printNameStart = "B3S";
     Handler handler = new Handler(Looper.getMainLooper());
 
     private boolean isSaveInstanceStateCalled = false;
@@ -84,14 +102,73 @@ public class BluetoothConnectFragment extends Fragment {
         super.onSaveInstanceState(outState);
         isSaveInstanceStateCalled = true;
     }
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        bind = FragmentBluetoothConnectBinding.inflate(inflater, container, false);
 
-        return bind.getRoot();
-    }
+        @SuppressLint("MissingPermission")
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            //蓝牙发现
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                Log.v(TAG, "测试:搜索中");
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+                if (device != null) {
+                    @SuppressLint("MissingPermission") String deviceName = device.getName();
+                    String deviceHardwareAddress = device.getAddress();
+                    @SuppressLint("MissingPermission") int deviceStatus = device.getBondState();
+
+
+                    @SuppressLint("MissingPermission") boolean supportBluetoothType = device.getType() == BluetoothDevice.DEVICE_TYPE_CLASSIC || device.getType() == BluetoothDevice.DEVICE_TYPE_DUAL;
+                    boolean supportPrintName;
+
+
+                    Log.d(TAG, "limebluetooth打印机  测试:打印机名称- " + deviceName + "，设备地址:" + deviceHardwareAddress + " 设备类型:" + device.getType());
+
+                    if (USER_DEFINED.equals(printNameStart)) {
+                        printNameStart = etModel.getText().toString().trim();
+                    }
+
+                    if (TextUtils.isEmpty(printNameStart)) {
+                        supportPrintName = deviceName != null;
+                    } else {
+                        supportPrintName = deviceName != null && deviceName.startsWith(printNameStart);
+                    }
+
+
+                    if (supportBluetoothType && supportPrintName) {
+                        if (deviceList.add(deviceName)) {
+                            blueDeviceList.add(new BlueDeviceInfo(deviceName, deviceHardwareAddress, deviceStatus));
+                            blueDeviceAdapter.notifyItemInserted(blueDeviceList.size());
+                        }
+                    }
+
+                }
+
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
+                Log.v(TAG, "测试:开始搜索");
+                spinKit.setVisibility(View.VISIBLE);
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                Log.v(TAG, "测试:搜索结束");
+                spinKit.setVisibility(View.GONE);
+            } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
+                int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1);
+                Log.d(TAG, "测试:配对状态改变:0 " + state);
+                if (itemPosition != -1 && itemPosition < blueDeviceList.size()) {
+                    Log.d(TAG, "测试:配对状态改变:1 ");
+                    blueDeviceList.get(itemPosition).setConnectState(state);
+                    Log.d(TAG, "测试:配对状态改变:2 " );
+                    blueDeviceAdapter.notifyItemChanged(itemPosition);
+                }
+
+            } else if (BluetoothDevice.ACTION_PAIRING_REQUEST.equals(action)) {
+                if (fragment != null) {
+                    fragment.dismiss();
+                }
+            }
+        }
+    };
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -112,9 +189,28 @@ public class BluetoothConnectFragment extends Fragment {
 
     }
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_bluetooth_connect, container, false);
+
+        spinKit = view.findViewById(R.id.spin_kit);
+        rvDeviceList = view.findViewById(R.id.rv_device_list);
+        tvConnected = view.findViewById(R.id.tv_connected);
+        tvName = view.findViewById(R.id.tv_name);
+        tvAddress = view.findViewById(R.id.tv_address);
+        tvStatus = view.findViewById(R.id.tv_status);
+        tvWifiConfigure = view.findViewById(R.id.tv_wifi_configure);
+        clConnected = view.findViewById(R.id.cl_connected);
+        clSearch = view.findViewById(R.id.cl_search);
+        etModel = view.findViewById(R.id.et_model);
+
+        return view;
+    }
+
     private void init() {
         context = MyApplication.getInstance();
-        bind.spinKit.setVisibility(View.GONE);
+        spinKit.setVisibility(View.GONE);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         deviceList = new HashSet<>();
@@ -133,8 +229,8 @@ public class BluetoothConnectFragment extends Fragment {
         Log.d(TAG, "初始化: 注册完成");
         //注册蓝牙列表适配器
         blueDeviceAdapter = new BlueDeviceAdapter(blueDeviceList);
-        bind.rvDeviceList.setAdapter(blueDeviceAdapter);
-        bind.rvDeviceList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        rvDeviceList.setAdapter(blueDeviceAdapter);
+        rvDeviceList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         //注册线程池
         ThreadFactory threadFactory = runnable -> {
             Thread thread = new Thread(runnable);
@@ -151,27 +247,6 @@ public class BluetoothConnectFragment extends Fragment {
     @SuppressLint({"NotifyDataSetChanged", "MissingPermission"})
     private void initEvent() {
         final String[] connectedDeviceName = {""};
-        bind.rgPrintModel.setOnCheckedChangeListener((group, checkedId) -> {
-            mBluetoothAdapter.cancelDiscovery();
-            bind.spinKit.setVisibility(View.GONE);
-            // 先设置为隐藏，后面根据情况调整可见性
-            bind.etModel.setVisibility(View.GONE);
-
-            if (R.id.rb_b3s == checkedId) {
-                printNameStart = "B3S";
-            } else if (R.id.rb_b21 == checkedId) {
-                printNameStart = "B21";
-            } else if (R.id.rb_Z401 == checkedId) {
-                printNameStart = "Z401";
-            } else if (R.id.rb_all == checkedId) {
-                printNameStart = "";
-            } else if (R.id.rb_input == checkedId) {
-                bind.etModel.setVisibility(View.VISIBLE);
-                printNameStart = USER_DEFINED;
-            }
-
-        });
-
 
         executorService.submit(() -> {
             SharedPreferences preferences = context.getSharedPreferences("connectedPrinterInfo", Context.MODE_PRIVATE);
@@ -186,13 +261,13 @@ public class BluetoothConnectFragment extends Fragment {
                     if (!deviceName.isEmpty()&&PrintUtil.getConnectedType()==0) {
                         Log.d(TAG, "测试:配对状态改变:判断连接状态3 " );
                         lastConnectedDevice = new BlueDeviceInfo(deviceName, deviceHardwareAddress, connectState);
-                        bind.tvConnected.setVisibility(View.VISIBLE);
+                        tvConnected.setVisibility(View.VISIBLE);
                         connectedDeviceName[0] = lastConnectedDevice.getDeviceName();
-                        bind.tvName.setText(connectedDeviceName[0]);
-                        bind.tvAddress.setText(lastConnectedDevice.getDeviceHardwareAddress());
+                        tvName.setText(connectedDeviceName[0]);
+                        tvAddress.setText(lastConnectedDevice.getDeviceHardwareAddress());
                         setWifiConfigureDisplayStatus(connectedDeviceName[0]);
-                        bind.tvStatus.setText("断开");
-                        bind.clConnected.setVisibility(View.VISIBLE);
+                        tvStatus.setText("断开");
+                        clConnected.setVisibility(View.VISIBLE);
                     }
                 });
 
@@ -203,7 +278,9 @@ public class BluetoothConnectFragment extends Fragment {
         });
 
         itemClickListener = position -> {
+            //连接蓝牙设备
             itemPosition = position;
+
             if (mBluetoothAdapter.isDiscovering()) {
                 mBluetoothAdapter.cancelDiscovery();
             }
@@ -213,7 +290,7 @@ public class BluetoothConnectFragment extends Fragment {
             switch (connectState) {
                 case Constant.NO_BOND -> executorService.submit(() -> {
                     requireActivity().runOnUiThread(() -> {
-                        bind.spinKit.setVisibility(View.GONE);
+                        spinKit.setVisibility(View.GONE);
                         fragment = new MyDialogLoadingFragment("配对中");
                         fragment.show(requireActivity().getSupportFragmentManager(), "pairing");
                     });
@@ -230,7 +307,7 @@ public class BluetoothConnectFragment extends Fragment {
 
                 case Constant.BONDED -> executorService.submit(() -> {
                     requireActivity().runOnUiThread(() -> {
-                        bind.spinKit.setVisibility(View.GONE);
+                        spinKit.setVisibility(View.GONE);
                         fragment = new MyDialogLoadingFragment("连接中");
                         fragment.show(requireActivity().getSupportFragmentManager(), "CONNECT");
                     });
@@ -281,13 +358,13 @@ public class BluetoothConnectFragment extends Fragment {
 
                         if (lastConnectedDevice != null) {
                             blueDeviceAdapter.notifyItemRemoved(position);
-                            bind.tvConnected.setVisibility(View.VISIBLE);
+                            tvConnected.setVisibility(View.VISIBLE);
                             connectedDeviceName[0] = lastConnectedDevice.getDeviceName();
-                            bind.tvName.setText(connectedDeviceName[0]);
-                            bind.tvAddress.setText(lastConnectedDevice.getDeviceHardwareAddress());
+                            tvName.setText(connectedDeviceName[0]);
+                            tvAddress.setText(lastConnectedDevice.getDeviceHardwareAddress());
                             setWifiConfigureDisplayStatus(connectedDeviceName[0]);
-                            bind.tvStatus.setText("断开");
-                            bind.clConnected.setVisibility(View.VISIBLE);
+                            tvStatus.setText("断开");
+                            clConnected.setVisibility(View.VISIBLE);
                         }
 
                         if (isSaveInstanceStateCalled) {
@@ -305,7 +382,7 @@ public class BluetoothConnectFragment extends Fragment {
             }
         };
 
-        bind.tvStatus.setOnClickListener(v -> {
+        tvStatus.setOnClickListener(v -> {
             PrintUtil.close();
             closeProcess();
 
@@ -313,19 +390,19 @@ public class BluetoothConnectFragment extends Fragment {
 
         blueDeviceAdapter.setOnClickListener(itemClickListener);
 
-        bind.clSearch.setOnClickListener(v -> {
+        clSearch.setOnClickListener(v -> {
             Log.d(TAG, "测试：初始化：搜索 ");
-            bind.spinKit.setVisibility(View.GONE);
+            spinKit.setVisibility(View.GONE);
             if (!mBluetoothAdapter.isEnabled()) {
                 Toast.makeText(getActivity(), "蓝牙未开启", Toast.LENGTH_SHORT).show();
             } else {
-                permissionRequest();
+                permissionBluetoothRequest();
             }
 
 
         });
 
-        bind.tvWifiConfigure.setOnClickListener(v -> {
+        tvWifiConfigure.setOnClickListener(v -> {
             WifiManager wifiManager = (WifiManager) requireActivity().getSystemService(Context.WIFI_SERVICE);
             String connectedWifiName = "";
             if (wifiManager != null && wifiManager.isWifiEnabled()) {
@@ -367,37 +444,6 @@ public class BluetoothConnectFragment extends Fragment {
 
     }
 
-    private void  closeProcess() {
-        SharedPreferences preferences = context.getSharedPreferences("printConfiguration", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("printMode", 1);
-        editor.putInt("printDensity", 3);
-        editor.putFloat("printMultiple", 8);
-        editor.apply(); //提交修改
-
-        SharedPreferences connectedPrinterInfo = context.getSharedPreferences("connectedPrinterInfo", Context.MODE_PRIVATE);
-        SharedPreferences.Editor connectedPrinterInfoEditor = connectedPrinterInfo.edit();
-        connectedPrinterInfoEditor.putString("deviceName", "");
-        connectedPrinterInfoEditor.putString("deviceHardwareAddress", "");
-        connectedPrinterInfoEditor.putInt("connectState", 11);
-        connectedPrinterInfoEditor.apply();
-
-        if (lastConnectedDevice != null) {
-            lastConnectedDevice.setConnectState(12);
-            blueDeviceList.add(lastConnectedDevice);
-        }
-
-        requireActivity().runOnUiThread(() -> {
-            bind.tvConnected.setVisibility(View.GONE);
-            bind.clConnected.setVisibility(View.GONE);
-            blueDeviceAdapter.notifyItemChanged(blueDeviceList.size() - 1);
-        });
-        lastConnectedDevice = null;
-
-
-
-    }
-
     // 在该类中添加方法来模拟WiFi配网操作
     private void simulateWiFiConfiguration(String wifiName, String wifiPassword) {
         // 通过线程池在子线程中执行WiFi配网操作
@@ -423,73 +469,38 @@ public class BluetoothConnectFragment extends Fragment {
         });
     }
 
-    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+    private void  closeProcess() {
+        SharedPreferences preferences = context.getSharedPreferences("printConfiguration", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("printMode", 1);
+        editor.putInt("printDensity", 3);
+        editor.putFloat("printMultiple", 8);
+        editor.apply(); //提交修改
 
+        SharedPreferences connectedPrinterInfo = context.getSharedPreferences("connectedPrinterInfo", Context.MODE_PRIVATE);
+        SharedPreferences.Editor connectedPrinterInfoEditor = connectedPrinterInfo.edit();
+        connectedPrinterInfoEditor.putString("deviceName", "");
+        connectedPrinterInfoEditor.putString("deviceHardwareAddress", "");
+        connectedPrinterInfoEditor.putInt("connectState", 11);
+        connectedPrinterInfoEditor.apply();
 
-        @SuppressLint("MissingPermission")
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            //蓝牙发现
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                Log.v(TAG, "测试:搜索中");
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
-                if (device != null) {
-                    @SuppressLint("MissingPermission") String deviceName = device.getName();
-                    String deviceHardwareAddress = device.getAddress();
-                    @SuppressLint("MissingPermission") int deviceStatus = device.getBondState();
-
-
-                    @SuppressLint("MissingPermission") boolean supportBluetoothType = device.getType() == BluetoothDevice.DEVICE_TYPE_CLASSIC || device.getType() == BluetoothDevice.DEVICE_TYPE_DUAL;
-                    boolean supportPrintName;
-
-
-                    Log.d(TAG, "测试:打印机名称- " + deviceName + "，设备地址:" + deviceHardwareAddress + "，设备类型:" + device.getType());
-
-                    if (USER_DEFINED.equals(printNameStart)) {
-                        printNameStart = bind.etModel.getText().toString().trim();
-                    }
-
-                    if (TextUtils.isEmpty(printNameStart)) {
-                        supportPrintName = deviceName != null;
-                    } else {
-                        supportPrintName = deviceName != null && deviceName.startsWith(printNameStart);
-                    }
-
-
-                    if (supportBluetoothType && supportPrintName) {
-                        if (deviceList.add(deviceName)) {
-                            blueDeviceList.add(new BlueDeviceInfo(deviceName, deviceHardwareAddress, deviceStatus));
-                            blueDeviceAdapter.notifyItemInserted(blueDeviceList.size());
-                        }
-                    }
-
-                }
-
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-                Log.v(TAG, "测试:开始搜索");
-                bind.spinKit.setVisibility(View.VISIBLE);
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                Log.v(TAG, "测试:搜索结束");
-                bind.spinKit.setVisibility(View.GONE);
-            } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
-                int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1);
-                Log.d(TAG, "测试:配对状态改变:0 " + state);
-                if (itemPosition != -1 && itemPosition < blueDeviceList.size()) {
-                    Log.d(TAG, "测试:配对状态改变:1 ");
-                    blueDeviceList.get(itemPosition).setConnectState(state);
-                    Log.d(TAG, "测试:配对状态改变:2 " );
-                    blueDeviceAdapter.notifyItemChanged(itemPosition);
-                }
-
-            } else if (BluetoothDevice.ACTION_PAIRING_REQUEST.equals(action)) {
-                if (fragment != null) {
-                    fragment.dismiss();
-                }
-            }
+        if (lastConnectedDevice != null) {
+            lastConnectedDevice.setConnectState(12);
+            blueDeviceList.add(lastConnectedDevice);
         }
-    };
+
+        requireActivity().runOnUiThread(() -> {
+            tvConnected.setVisibility(View.GONE);
+            clConnected.setVisibility(View.GONE);
+            blueDeviceAdapter.notifyItemChanged(blueDeviceList.size() - 1);
+        });
+        lastConnectedDevice = null;
+
+
+
+    }
+
+
 
     /**
      * Gps开启状态判断
@@ -501,7 +512,7 @@ public class BluetoothConnectFragment extends Fragment {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
-    private void permissionRequest() {
+    private void permissionBluetoothRequest() {
         String[] permissions;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             permissions = new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT};
@@ -532,7 +543,6 @@ public class BluetoothConnectFragment extends Fragment {
         }
     }
 
-
     @SuppressLint({"MissingPermission", "NotifyDataSetChanged"})
     private void startBluetoothDiscovery() {
         Log.d(TAG, "测试:开始搜索1");
@@ -543,7 +553,7 @@ public class BluetoothConnectFragment extends Fragment {
         blueDeviceList.clear();
         Log.d(TAG, "测试:开始搜索2");
         blueDeviceAdapter.notifyItemRangeRemoved(0, itemCount);
-        bind.spinKit.setVisibility(View.VISIBLE);
+        spinKit.setVisibility(View.VISIBLE);
         Log.d(TAG, "测试:开始搜索4");
         if (mBluetoothAdapter.isDiscovering()) {
             Log.d(TAG, "测试:开始搜索5");
@@ -574,9 +584,9 @@ public class BluetoothConnectFragment extends Fragment {
 
     private void setWifiConfigureDisplayStatus(String deviceName) {
         if (deviceName.startsWith("K3_W")) {
-            bind.tvWifiConfigure.setVisibility(View.VISIBLE);
+            tvWifiConfigure.setVisibility(View.VISIBLE);
         } else {
-            bind.tvWifiConfigure.setVisibility(View.GONE);
+            tvWifiConfigure.setVisibility(View.GONE);
         }
     }
 

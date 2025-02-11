@@ -2,14 +2,15 @@ package com.niimbot.jcdemo.adapter;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.gengcon.www.jcprintersdk.bean.PrinterDevice;
+import com.niimbot.jcdemo.R;
 import com.niimbot.jcdemo.bean.WifiDeviceInfo;
-import com.niimbot.jcdemo.databinding.WifiItemBinding;
 
 import java.util.List;
 
@@ -41,15 +42,15 @@ public class WifiDeviceAdapter extends RecyclerView.Adapter<WifiDeviceAdapter.Wi
     @NonNull
     @Override
     public WifiDevicerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        WifiItemBinding bind = WifiItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new WifiDevicerViewHolder(bind);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.wifi_item, parent, false);
+        return new WifiDevicerViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull WifiDeviceAdapter.WifiDevicerViewHolder holder, int position) {
-        holder.bind.tvName.setText(wifiDeviceList.get(position).getDeviceName());
-        holder.bind.tvAddress.setText(wifiDeviceList.get(position).getIp());
-        holder.bind.tvStatus.setText("未连接");
+        holder.tvName.setText(wifiDeviceList.get(position).getDeviceName());
+        holder.tvAddress.setText(wifiDeviceList.get(position).getIp());
+        holder.tvStatus.setText("未连接");
         holder.itemView.setOnClickListener(v -> listener.onItemClick(position));
     }
 
@@ -60,10 +61,15 @@ public class WifiDeviceAdapter extends RecyclerView.Adapter<WifiDeviceAdapter.Wi
 
 
     static class  WifiDevicerViewHolder extends RecyclerView.ViewHolder{
-        WifiItemBinding bind;
-        public WifiDevicerViewHolder(WifiItemBinding bind) {
-            super(bind.getRoot());
-            this.bind = bind;
+        public TextView tvName;
+        public TextView tvAddress;
+
+        public TextView tvStatus;
+        public WifiDevicerViewHolder(View itemView) {
+            super(itemView);
+            tvName = itemView.findViewById(R.id.tv_name);
+            tvAddress = itemView.findViewById(R.id.tv_address);
+            tvStatus = itemView.findViewById(R.id.tv_status);
         }
     }
 }

@@ -2,13 +2,15 @@ package com.niimbot.jcdemo.adapter;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.niimbot.jcdemo.R;
 import com.niimbot.jcdemo.bean.BlueDeviceInfo;
-import com.niimbot.jcdemo.databinding.BluetoothItemBinding;
 
 import java.util.List;
 
@@ -42,14 +44,14 @@ public class BlueDeviceAdapter extends RecyclerView.Adapter<BlueDeviceAdapter.Bl
     @NonNull
     @Override
     public BlueDeviceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        BluetoothItemBinding bind = BluetoothItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new BlueDeviceViewHolder(bind);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.bluetooth_item, parent, false);
+        return new BlueDeviceViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull BlueDeviceViewHolder holder, int position) {
-        holder.bind.tvName.setText(blueDeviceInfoList.get(position).getDeviceName());
-        holder.bind.tvAddress.setText(blueDeviceInfoList.get(position).getDeviceHardwareAddress());
+        holder.tvName.setText(blueDeviceInfoList.get(position).getDeviceName());
+        holder.tvAddress.setText(blueDeviceInfoList.get(position).getDeviceHardwareAddress());
         String status = "";
         int color  ;
         switch (blueDeviceInfoList.get(position).getConnectState()) {
@@ -70,8 +72,8 @@ public class BlueDeviceAdapter extends RecyclerView.Adapter<BlueDeviceAdapter.Bl
                 break;
         }
 
-        holder.bind.tvStatus.setText(status);
-        holder.bind.tvStatus.setTextColor(color);
+        holder.tvStatus.setText(status);
+        holder.tvStatus.setTextColor(color);
         holder.itemView.setOnClickListener(v -> listener.onItemClick(position));
 
     }
@@ -83,12 +85,16 @@ public class BlueDeviceAdapter extends RecyclerView.Adapter<BlueDeviceAdapter.Bl
     }
 
     public static class BlueDeviceViewHolder extends RecyclerView.ViewHolder {
-        BluetoothItemBinding bind;
+        public TextView tvName;
+        public TextView tvAddress;
 
-        public BlueDeviceViewHolder(BluetoothItemBinding bind) {
-            super(bind.getRoot());
-            this.bind = bind;
+        public TextView tvStatus;
 
+        public BlueDeviceViewHolder(View itemView) {
+            super(itemView);
+            tvName = itemView.findViewById(R.id.tv_name);
+            tvAddress = itemView.findViewById(R.id.tv_address);
+            tvStatus = itemView.findViewById(R.id.tv_status);
         }
     }
 }

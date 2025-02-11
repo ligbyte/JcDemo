@@ -10,8 +10,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -20,17 +22,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gengcon.www.jcprintersdk.bean.PrinterDevice;
 import com.gengcon.www.jcprintersdk.callback.ScanCallback;
+import com.github.ybq.android.spinkit.SpinKitView;
 import com.niimbot.jcdemo.R;
 import com.niimbot.jcdemo.adapter.BlueDeviceAdapter;
 import com.niimbot.jcdemo.adapter.WifiDeviceAdapter;
 import com.niimbot.jcdemo.app.MyApplication;
 import com.niimbot.jcdemo.bean.BlueDeviceInfo;
 import com.niimbot.jcdemo.bean.WifiDeviceInfo;
-import com.niimbot.jcdemo.databinding.FragmentWifiConnectBinding;
 import com.niimbot.jcdemo.ui.MyDialogLoadingFragment;
 import com.niimbot.jcdemo.utils.PrintUtil;
 
@@ -51,7 +55,6 @@ public class WifiConnectFragment extends Fragment {
     private ExecutorService executorService;
     private Context context;
     private static final String USER_DEFINED = "自定义";
-    private FragmentWifiConnectBinding bind;
     private List<WifiDeviceInfo> wifiDeviceList;
     private Set<String> deviceList;
 
@@ -61,10 +64,23 @@ public class WifiConnectFragment extends Fragment {
     private int itemPosition;
     private WifiDeviceInfo lastConnectedDevice;
 
+    private SpinKitView spinKit;
+    private RecyclerView rvDeviceList;
+    private TextView tvConnected;
+    private TextView tvName;
+    private TextView tvAddress;
+    private TextView tvStatus;
+
+    private ConstraintLayout clConnected;
+
+    private ConstraintLayout clSearch;
+
+    private EditText etModel;
+
     /**
      * 打印机过滤
      */
-    private String printNameStart = "";
+    private String printNameStart = "B3S";
 
     Handler handler = new Handler(Looper.getMainLooper());
     private boolean isSaveInstanceStateCalled = false;
@@ -93,7 +109,7 @@ public class WifiConnectFragment extends Fragment {
 
     private void init() {
         context = MyApplication.getInstance();
-        bind.spinKit.setVisibility(View.GONE);
+        spinKit.setVisibility(View.GONE);
         deviceList = new HashSet<>();
         wifiDeviceList = new ArrayList<>();
 
@@ -101,8 +117,8 @@ public class WifiConnectFragment extends Fragment {
         //注册蓝牙列表适配器
         wifiDeviceAdapter = new WifiDeviceAdapter(wifiDeviceList);
 
-        bind.rvDeviceList.setAdapter(wifiDeviceAdapter);
-        bind.rvDeviceList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        rvDeviceList.setAdapter(wifiDeviceAdapter);
+        rvDeviceList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         //注册线程池
         ThreadFactory threadFactory = runnable -> {
             Thread thread = new Thread(runnable);
@@ -117,38 +133,32 @@ public class WifiConnectFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        bind = FragmentWifiConnectBinding.inflate(inflater, container, false);
-        return bind.getRoot();
+        View view = inflater.inflate(R.layout.fragment_wifi_connect, container, false);
+        spinKit = view.findViewById(R.id.spin_kit);
+        rvDeviceList = view.findViewById(R.id.rv_device_list);
+        tvConnected = view.findViewById(R.id.tv_connected);
+        tvName = view.findViewById(R.id.tv_name);
+        tvAddress = view.findViewById(R.id.tv_address);
+        tvStatus = view.findViewById(R.id.tv_status);
+        clConnected = view.findViewById(R.id.cl_connected);
+        clSearch = view.findViewById(R.id.cl_search);
+        etModel = view.findViewById(R.id.et_model);
+        return view;
     }
 
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        bind = null;
     }
 
 
     private void initEvent() {
         final String[] connectedDeviceName = {""};
-        bind.rgPrintModel.setOnCheckedChangeListener((group, checkedId) -> {
-            bind.spinKit.setVisibility(View.GONE);
-            // 先设置为隐藏，后面根据情况调整可见性
-            bind.etModel.setVisibility(View.GONE);
 
-            if (R.id.rb_k3w == checkedId) {
-                printNameStart = "K3_W";
-            } else if (R.id.rb_all == checkedId) {
-                printNameStart = "";
-            } else if (R.id.rb_input == checkedId) {
-                bind.etModel.setVisibility(View.VISIBLE);
-                printNameStart = USER_DEFINED;
-            }
-
-        });
-        bind.clSearch.setOnClickListener(view -> {
+        clSearch.setOnClickListener(view -> {
             Handler handler = new Handler(Looper.getMainLooper());
-            bind.spinKit.setVisibility(View.VISIBLE);
+            spinKit.setVisibility(View.VISIBLE);
             int itemCount = wifiDeviceList.size();
             wifiDeviceList.clear();
             deviceList.clear();
@@ -156,7 +166,7 @@ public class WifiConnectFragment extends Fragment {
             requireActivity();
             WifiManager wifiManager = (WifiManager) requireActivity().getSystemService(Context.WIFI_SERVICE);
             if (wifiManager == null || !wifiManager.isWifiEnabled()) {
-                bind.spinKit.setVisibility(View.GONE);
+                spinKit.setVisibility(View.GONE);
                 return;
             }
 
@@ -181,7 +191,7 @@ public class WifiConnectFragment extends Fragment {
                 public void onFinish() {
                     Log.d(TAG, "onFinish: " + "搜索完成");
                     handler.post(() -> {
-                        bind.spinKit.setVisibility(View.GONE);
+                        spinKit.setVisibility(View.GONE);
                         Toast.makeText(context, "搜索完成", Toast.LENGTH_SHORT).show();
                     });
 
@@ -201,12 +211,12 @@ public class WifiConnectFragment extends Fragment {
                 handler.post(() -> {
                     if (!deviceName.isEmpty()&&PrintUtil.getConnectedType()==1) {
                         lastConnectedDevice = new WifiDeviceInfo(deviceName, ip, port, connectState);
-                        bind.tvConnected.setVisibility(View.VISIBLE);
+                        tvConnected.setVisibility(View.VISIBLE);
                         connectedDeviceName[0] = lastConnectedDevice.getDeviceName();
-                        bind.tvName.setText(connectedDeviceName[0]);
-                        bind.tvAddress.setText(lastConnectedDevice.getIp());
-                        bind.tvStatus.setText("断开");
-                        bind.clConnected.setVisibility(View.VISIBLE);
+                        tvName.setText(connectedDeviceName[0]);
+                        tvAddress.setText(lastConnectedDevice.getIp());
+                        tvStatus.setText("断开");
+                        clConnected.setVisibility(View.VISIBLE);
                     }
                 });
 
@@ -219,7 +229,7 @@ public class WifiConnectFragment extends Fragment {
             Handler handler = new Handler(Looper.getMainLooper());
             itemPosition = position;
             WifiDeviceInfo wifiDeviceInfo = wifiDeviceList.get(itemPosition);
-            handler.post(() -> bind.spinKit.setVisibility(View.GONE));
+            handler.post(() -> spinKit.setVisibility(View.GONE));
             executorService.submit(() -> {
                 fragment = new MyDialogLoadingFragment("连接中");
                 fragment.show(requireActivity().getSupportFragmentManager(), "CONNECT");
@@ -276,12 +286,12 @@ public class WifiConnectFragment extends Fragment {
 
                     if (lastConnectedDevice != null) {
                         wifiDeviceAdapter.notifyItemRemoved(position);
-                        bind.tvConnected.setVisibility(View.VISIBLE);
+                        tvConnected.setVisibility(View.VISIBLE);
                         connectedDeviceName[0] = lastConnectedDevice.getDeviceName();
-                        bind.tvName.setText(connectedDeviceName[0]);
-                        bind.tvAddress.setText(lastConnectedDevice.getIp());
-                        bind.tvStatus.setText("断开");
-                        bind.clConnected.setVisibility(View.VISIBLE);
+                        tvName.setText(connectedDeviceName[0]);
+                        tvAddress.setText(lastConnectedDevice.getIp());
+                        tvStatus.setText("断开");
+                        clConnected.setVisibility(View.VISIBLE);
                     }
 
 
@@ -299,7 +309,7 @@ public class WifiConnectFragment extends Fragment {
 
         wifiDeviceAdapter.setOnClickListener(itemClickListener);
 
-        bind.tvStatus.setOnClickListener(v -> {
+        tvStatus.setOnClickListener(v -> {
             PrintUtil.close();
             closeProcess();
 
@@ -326,8 +336,8 @@ public class WifiConnectFragment extends Fragment {
         }
 
         handler.post(() -> {
-            bind.tvConnected.setVisibility(View.GONE);
-            bind.clConnected.setVisibility(View.GONE);
+            tvConnected.setVisibility(View.GONE);
+            clConnected.setVisibility(View.GONE);
             wifiDeviceAdapter.notifyItemChanged(wifiDeviceList.size() - 1);
         });
 
