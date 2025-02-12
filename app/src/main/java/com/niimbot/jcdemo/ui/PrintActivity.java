@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
@@ -241,7 +242,8 @@ public class PrintActivity extends AppCompatActivity {
                         if (deviceList.add(deviceName)) {
                             Log.d(TAG, "limebluetooth打印机 测试:打印机名称 235: " + deviceName);
                             hasDiscoveryBluetooth = true;
-                            tipsDialog.dismiss();
+                            dismissLoadingDialog();
+                            Log.d(TAG, "limedialog dismissLoadingDialog: " + 246);
                             blueDeviceList.add(new BlueDeviceInfo(deviceName, deviceHardwareAddress, deviceStatus));
                             ArrayList<DialogMenuItem> mMenuItems = new ArrayList<>();
                             for (int i = 0; i < blueDeviceList.size(); i++) {
@@ -275,9 +277,8 @@ public class PrintActivity extends AppCompatActivity {
                 }
 
             } else if (BluetoothDevice.ACTION_PAIRING_REQUEST.equals(action)) {
-                if (tipsDialog != null) {
-                    tipsDialog.dismiss();
-                }
+                dismissLoadingDialog();
+                Log.d(TAG, "limedialog dismissLoadingDialog: " + 281);
             }
         }
     };
@@ -299,17 +300,24 @@ public class PrintActivity extends AppCompatActivity {
     }
 
     private void connectPrinterByPosition(int position) {
+        showLoadingDialog("连接打印机......","CONNECT");
+        Log.d(TAG, "limedialog showLoadingDialog: " + 304);
+        String[] permissions;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissions = new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT};
+        } else {
+            permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+        }
 
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return;
-//        }
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(context, permission) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                // 如果有任何一个权限未被授予，则返回false
+                dismissLoadingDialog();
+                Log.d(TAG, "limedialog dismissLoadingDialog: " + 316);
+                return ;
+            }
+        }
+
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();
         }
@@ -319,8 +327,8 @@ public class PrintActivity extends AppCompatActivity {
         switch (connectState) {
             case Constant.NO_BOND -> executorService.submit(() -> {
                 runOnUiThread(() -> {
-                    tipsDialog = new MyDialogLoadingFragment("配对中");
-                    tipsDialog.show(getSupportFragmentManager(), "pairing");
+                    showLoadingDialog("配对中","pairing");
+                    Log.d(TAG, "limedialog showLoadingDialog: " + 326);
                 });
                 Log.d(TAG, "配对: 开始");
                 boolean returnValue = false;
@@ -334,10 +342,6 @@ public class PrintActivity extends AppCompatActivity {
             });
 
             case Constant.BONDED -> executorService.submit(() -> {
-//                runOnUiThread(() -> {
-//                    tipsDialog = new MyDialogLoadingFragment("打印中");
-//                    tipsDialog.show(getSupportFragmentManager(), "CONNECT");
-//                });
 
                 BlueDeviceInfo blueDeviceInfo = new BlueDeviceInfo(bluetoothDevice.getName(), bluetoothDevice.getAddress(), connectState);
                 PrintUtil.setConnectedType(-1);
@@ -392,7 +396,8 @@ public class PrintActivity extends AppCompatActivity {
                     }
 
 
-                    tipsDialog.dismiss();
+                    dismissLoadingDialog();
+                    Log.d(TAG, "limedialog dismissLoadingDialog: " + 401);
                     if (connectResult != 0) {
                         Toast.makeText(PrintActivity.this, hint, Toast.LENGTH_SHORT).show();
                     }
@@ -512,8 +517,8 @@ public class PrintActivity extends AppCompatActivity {
                 } else {
                     //搜索蓝牙
                     runOnUiThread(() -> {
-                        tipsDialog = new MyDialogLoadingFragment("搜索打印机设备中");
-                        tipsDialog.show(getSupportFragmentManager(), "pairing");
+                        showLoadingDialog("搜索打印机设备中","searching");
+                        Log.d(TAG, "limedialog showLoadingDialog: " + 519);
                     });
                     handler.postDelayed(new Runnable() {
                         @Override
@@ -521,7 +526,8 @@ public class PrintActivity extends AppCompatActivity {
                             if (!hasDiscoveryBluetooth){
                                 runOnUiThread(() -> {
                                     Toast.makeText(PrintActivity.this, "请确保打印机设备已开启", Toast.LENGTH_SHORT).show();
-                                    tipsDialog.dismiss();
+                                    dismissLoadingDialog();
+                                    Log.d(TAG, "limedialog dismissLoadingDialog: " + 531);
                                 });
                             }
                         }
@@ -535,10 +541,8 @@ public class PrintActivity extends AppCompatActivity {
             return;
         }
 
-        tipsDialog = new MyDialogLoadingFragment("打印中");
-        tipsDialog.show(getSupportFragmentManager(), "PRINT");
-
-
+        showLoadingDialog("打印中","PRINT");
+        Log.d(TAG, "limedialog showLoadingDialog: " + 542);
         //重置错误状态变量
         isError = false;
         //重置取消打印状态变量
@@ -573,7 +577,8 @@ public class PrintActivity extends AppCompatActivity {
                     } else {
                         Log.d(TAG, "结束打印失败");
                     }
-                    tipsDialog.dismiss();
+                    dismissLoadingDialog();
+                    Log.d(TAG, "limedialog dismissLoadingDialog: " + 582);
                     handlePrintResult(tipsDialog, "打印成功");
                 }
 
@@ -789,4 +794,18 @@ public class PrintActivity extends AppCompatActivity {
         super.onDestroy();
         unregisterReceiver(receiver);
     }
+
+    private void showLoadingDialog(String msg,String tag) {
+        dismissLoadingDialog();
+        tipsDialog = new MyDialogLoadingFragment(msg);
+        tipsDialog.show(getSupportFragmentManager(), tag);
+    }
+
+
+    private void dismissLoadingDialog() {
+        if (tipsDialog != null) {
+            tipsDialog.dismiss();
+        }
+    }
+
 }
