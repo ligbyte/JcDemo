@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.flyco.animation.BounceEnter.BounceTopEnter;
 import com.flyco.animation.SlideExit.SlideBottomExit;
 import com.flyco.animation.ZoomEnter.ZoomInEnter;
+import com.flyco.animation.ZoomExit.ZoomInExit;
 import com.flyco.animation.ZoomExit.ZoomOutExit;
 import com.flyco.dialog.entity.DialogMenuItem;
 import com.flyco.dialog.listener.OnOperItemClickL;
@@ -282,7 +283,7 @@ public class PrintActivity extends AppCompatActivity {
         final NormalListDialog dialog = new NormalListDialog(PrintActivity.this, mMenuItems);
         dialog.title("请选择打印机")//
                 .showAnim(new ZoomInEnter())
-                .dismissAnim(new ZoomOutExit())
+                .dismissAnim(new ZoomInExit())
                 .show();
         dialog.setOnOperItemClickL(new OnOperItemClickL() {
             @Override
@@ -391,7 +392,8 @@ public class PrintActivity extends AppCompatActivity {
                     }
 
 
-                    dismissLoadingDialog();
+                    //dismissLoadingDialog();
+
                     Log.d(TAG, "limedialog dismissLoadingDialog: " + 401);
                     if (connectResult != 0) {
                         Toast.makeText(PrintActivity.this, hint, Toast.LENGTH_SHORT).show();
