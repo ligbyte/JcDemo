@@ -1,4 +1,4 @@
-package com.niimbot.jcdemo.bean;
+package com.niimbot.printer.bean;
 
 public class WifiDeviceInfo {
 

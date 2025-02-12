@@ -1,4 +1,4 @@
-package com.niimbot.jcdemo.utils;
+package com.niimbot.printer.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

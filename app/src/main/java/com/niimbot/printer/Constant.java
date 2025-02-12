@@ -1,4 +1,4 @@
-package com.niimbot.jcdemo;
+package com.niimbot.printer;
 
 /**
  * @author zhangbin

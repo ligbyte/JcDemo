@@ -1,4 +1,4 @@
-package com.niimbot.jcdemo.fragment;
+package com.niimbot.printer.fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -33,16 +33,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.ybq.android.spinkit.SpinKitView;
-import com.niimbot.jcdemo.Constant;
+import com.niimbot.printer.Constant;
 import com.niimbot.jcdemo.R;
-import com.niimbot.jcdemo.adapter.BlueDeviceAdapter;
-import com.niimbot.jcdemo.app.MyApplication;
-import com.niimbot.jcdemo.bean.BlueDeviceInfo;
-import com.niimbot.jcdemo.ui.MyDialogFragment;
-import com.niimbot.jcdemo.ui.MyDialogLoadingFragment;
-import com.niimbot.jcdemo.ui.MyDialogWifiSetFragment;
-import com.niimbot.jcdemo.utils.BluetoothUtils;
-import com.niimbot.jcdemo.utils.PrintUtil;
+import com.niimbot.printer.adapter.BlueDeviceAdapter;
+import com.niimbot.printer.app.MyApplication;
+import com.niimbot.printer.bean.BlueDeviceInfo;
+import com.niimbot.printer.ui.MyDialogFragment;
+import com.niimbot.printer.ui.MyDialogLoadingFragment;
+import com.niimbot.printer.ui.MyDialogWifiSetFragment;
+import com.niimbot.printer.utils.BluetoothUtils;
+import com.niimbot.printer.utils.PrintUtil;
 import com.permissionx.guolindev.PermissionX;
 
 import java.util.ArrayList;

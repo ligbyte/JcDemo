@@ -1,4 +1,4 @@
-package com.niimbot.jcdemo.utils;
+package com.niimbot.printer.utils;
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -7,7 +7,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.util.Log
-import com.niimbot.jcdemo.bean.Dish
+import com.niimbot.printer.bean.Dish
 
 private const val TAG = "ImgUtil"
 /**
@@ -53,7 +53,7 @@ class ImgUtil {
          * @return 菜品需要打印的高度
          */
         fun getProBmpHeight(
-            list: ArrayList<Dish>, normalFontHeight: Int, perLineDistance: Int, toKitchen: Boolean
+                list: ArrayList<Dish>, normalFontHeight: Int, perLineDistance: Int, toKitchen: Boolean
         ): Int {
             var h = 0 // 总高度
             for (i in list.indices) {

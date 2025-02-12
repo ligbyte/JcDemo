@@ -1,24 +1,11 @@
-package com.niimbot.jcdemo.utils;
+package com.niimbot.printer.utils;
 
-
-import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.gengcon.www.jcprintersdk.JCPrintApi;
 import com.gengcon.www.jcprintersdk.callback.Callback;
-import com.gengcon.www.jcprintersdk.callback.PrintCallback;
-import com.niimbot.jcdemo.app.MyApplication;
+import com.niimbot.printer.app.MyApplication;
 
 import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 打印工具类

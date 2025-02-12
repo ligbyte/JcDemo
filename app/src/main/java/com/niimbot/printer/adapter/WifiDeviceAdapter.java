@@ -1,6 +1,5 @@
-package com.niimbot.jcdemo.adapter;
+package com.niimbot.printer.adapter;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.niimbot.jcdemo.R;
-import com.niimbot.jcdemo.bean.WifiDeviceInfo;
+import com.niimbot.printer.bean.WifiDeviceInfo;
 
 import java.util.List;
 

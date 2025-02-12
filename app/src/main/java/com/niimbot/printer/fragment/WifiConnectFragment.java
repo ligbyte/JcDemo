@@ -1,10 +1,7 @@
-package com.niimbot.jcdemo.fragment;
+package com.niimbot.printer.fragment;
 
-import android.app.usage.NetworkStatsManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 
@@ -30,13 +27,11 @@ import com.gengcon.www.jcprintersdk.bean.PrinterDevice;
 import com.gengcon.www.jcprintersdk.callback.ScanCallback;
 import com.github.ybq.android.spinkit.SpinKitView;
 import com.niimbot.jcdemo.R;
-import com.niimbot.jcdemo.adapter.BlueDeviceAdapter;
-import com.niimbot.jcdemo.adapter.WifiDeviceAdapter;
-import com.niimbot.jcdemo.app.MyApplication;
-import com.niimbot.jcdemo.bean.BlueDeviceInfo;
-import com.niimbot.jcdemo.bean.WifiDeviceInfo;
-import com.niimbot.jcdemo.ui.MyDialogLoadingFragment;
-import com.niimbot.jcdemo.utils.PrintUtil;
+import com.niimbot.printer.adapter.WifiDeviceAdapter;
+import com.niimbot.printer.app.MyApplication;
+import com.niimbot.printer.bean.WifiDeviceInfo;
+import com.niimbot.printer.ui.MyDialogLoadingFragment;
+import com.niimbot.printer.utils.PrintUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;

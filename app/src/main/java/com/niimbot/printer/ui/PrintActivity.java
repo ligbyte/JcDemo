@@ -1,11 +1,9 @@
-package com.niimbot.jcdemo.ui;
+package com.niimbot.printer.ui;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -16,8 +14,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.location.LocationManager;
 import android.os.Build;
@@ -30,31 +26,29 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flyco.animation.BounceEnter.BounceTopEnter;
 import com.flyco.animation.SlideExit.SlideBottomExit;
+import com.flyco.animation.ZoomEnter.ZoomInEnter;
+import com.flyco.animation.ZoomExit.ZoomOutExit;
 import com.flyco.dialog.entity.DialogMenuItem;
 import com.flyco.dialog.listener.OnOperItemClickL;
 import com.flyco.dialog.widget.NormalListDialog;
 import com.gengcon.www.jcprintersdk.callback.PrintCallback;
-import com.niimbot.jcdemo.Constant;
+import com.niimbot.printer.Constant;
 import com.niimbot.jcdemo.R;
-import com.niimbot.jcdemo.app.MyApplication;
-import com.niimbot.jcdemo.bean.BlueDeviceInfo;
-import com.niimbot.jcdemo.bean.Dish;
-import com.niimbot.jcdemo.utils.AssetCopier;
-import com.niimbot.jcdemo.utils.BluetoothUtils;
-import com.niimbot.jcdemo.utils.ImgUtil;
-import com.niimbot.jcdemo.utils.PrintUtil;
+import com.niimbot.printer.app.MyApplication;
+import com.niimbot.printer.bean.BlueDeviceInfo;
+import com.niimbot.printer.bean.Dish;
+import com.niimbot.printer.utils.AssetCopier;
+import com.niimbot.printer.utils.BluetoothUtils;
+import com.niimbot.printer.utils.ImgUtil;
+import com.niimbot.printer.utils.PrintUtil;
 import com.permissionx.guolindev.PermissionX;
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -273,7 +267,7 @@ public class PrintActivity extends AppCompatActivity {
                     Log.d(TAG, "测试:配对状态改变:1 ");
                     blueDeviceList.get(itemPosition).setConnectState(state);
                     Log.d(TAG, "测试:配对状态改变:2 ");
-                    //blueDeviceAdapter.notifyItemChanged(itemPosition);
+                    connectPrinterByPosition(itemPosition);
                 }
 
             } else if (BluetoothDevice.ACTION_PAIRING_REQUEST.equals(action)) {
@@ -287,12 +281,13 @@ public class PrintActivity extends AppCompatActivity {
     private void NormalListDialog(ArrayList<DialogMenuItem> mMenuItems) {
         final NormalListDialog dialog = new NormalListDialog(PrintActivity.this, mMenuItems);
         dialog.title("请选择打印机")//
-                .showAnim(new BounceTopEnter())
-                .dismissAnim(new SlideBottomExit())
+                .showAnim(new ZoomInEnter())
+                .dismissAnim(new ZoomOutExit())
                 .show();
         dialog.setOnOperItemClickL(new OnOperItemClickL() {
             @Override
             public void onOperItemClick(AdapterView<?> parent, View view, int position, long id) {
+                itemPosition = position;
                 connectPrinterByPosition(position);
                 dialog.dismiss();
             }

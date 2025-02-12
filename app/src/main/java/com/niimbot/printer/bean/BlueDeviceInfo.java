@@ -1,4 +1,4 @@
-package com.niimbot.jcdemo.bean;
+package com.niimbot.printer.bean;
 
 import androidx.annotation.Nullable;
 

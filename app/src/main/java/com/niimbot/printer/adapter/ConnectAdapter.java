@@ -1,4 +1,4 @@
-package com.niimbot.jcdemo.adapter;
+package com.niimbot.printer.adapter;
 
 
 import androidx.annotation.NonNull;
@@ -6,11 +6,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.niimbot.jcdemo.fragment.BluetoothConnectFragment;
-import com.niimbot.jcdemo.fragment.WifiConnectFragment;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.niimbot.printer.fragment.BluetoothConnectFragment;
+import com.niimbot.printer.fragment.WifiConnectFragment;
 
 
 public class ConnectAdapter  extends FragmentStateAdapter {

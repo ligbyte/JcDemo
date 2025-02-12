@@ -1,4 +1,4 @@
-package com.niimbot.jcdemo.ui;
+package com.niimbot.printer.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.niimbot.jcdemo.R;
-import com.niimbot.jcdemo.adapter.ConnectAdapter;
+import com.niimbot.printer.adapter.ConnectAdapter;
 
 /**
  * 设备连接

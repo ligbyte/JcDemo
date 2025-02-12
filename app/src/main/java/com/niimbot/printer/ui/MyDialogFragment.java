@@ -1,4 +1,4 @@
-package com.niimbot.jcdemo.ui;
+package com.niimbot.printer.ui;
 
 import android.app.Dialog;
 import android.content.DialogInterface;

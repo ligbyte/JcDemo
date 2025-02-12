@@ -1,4 +1,4 @@
-package com.niimbot.jcdemo.adapter;
+package com.niimbot.printer.adapter;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.niimbot.jcdemo.R;
-import com.niimbot.jcdemo.bean.BlueDeviceInfo;
+import com.niimbot.printer.bean.BlueDeviceInfo;
 
 import java.util.List;
 

@@ -1,6 +1,5 @@
-package com.niimbot.jcdemo.utils;
+package com.niimbot.printer.utils;
 
-import android.Manifest;
 import android.util.Log;
 
 import androidx.fragment.app.FragmentActivity;

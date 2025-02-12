@@ -1,7 +1,6 @@
-package com.niimbot.jcdemo.app;
+package com.niimbot.printer.app;
 
 import android.app.Application;
-import android.content.Context;
 
 /**
  * 自定义Application
