@@ -505,13 +505,14 @@ public class PrintActivity extends AppCompatActivity {
                         public void run() {
                             if (!hasDiscoveryBluetooth){
                                 runOnUiThread(() -> {
-                                    Toast.makeText(PrintActivity.this, "请开启打印机", Toast.LENGTH_SHORT).show();
-                                    dismissLoadingDialog();
+//                                    Toast.makeText(PrintActivity.this, "请开启打印机", Toast.LENGTH_SHORT).show();
+//                                    dismissLoadingDialog();
                                     Log.d(TAG, "limedialog dismissLoadingDialog: " + 531);
 //                                    tipLoadDialog.setNoShadowTheme()
 //                                            .setMsgAndType("请开启打印机", TipLoadDialog.ICON_TYPE_FAIL)
 //                                            .setTipTime(3000)
 //                                            .show();
+                                    showLoadingDialog("请开启打印机","FAIL");
                                 });
                             }
                         }
@@ -794,6 +795,16 @@ public class PrintActivity extends AppCompatActivity {
                         {
                             //startActivity(new Intent(DialogTipActivity.this, HomeActivity.class));
                             //然后可以finish掉当前登录页
+                        }
+                    }).show();
+        } else if (tag.equals("FAIL")){
+            tipLoadDialog.setMsgAndType(msg, TipLoadDialog.ICON_TYPE_FAIL)
+                    .setDismissListener(new TipLoadDialog.DismissListener()
+                    {
+                        @Override
+                        public void onDimissListener()
+                        {
+
                         }
                     }).show();
         }else {
