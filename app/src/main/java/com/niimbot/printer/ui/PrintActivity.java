@@ -593,7 +593,8 @@ public class PrintActivity extends AppCompatActivity {
                     ArrayList<Dish> dishList = new ArrayList<>();
                     dishList.add(new Dish("辣椒炒肉", "中辣", 29.9, 1));
                     dishList.add(new Dish("土豆牛腩", "中辣", 49.9, 1));
-
+                    dishList.add(new Dish("蜀山辣子鸡", "中辣", 29.9, 1));
+                    dishList.add(new Dish("佛跳墙", "中辣", 49.9, 1));
                     Bitmap bitmap = ImgUtil.Companion.generatePosReceiptImage(dishList);
                     int bitmapWidth = bitmap.getWidth();
                     int bitmapHeight = bitmap.getHeight();

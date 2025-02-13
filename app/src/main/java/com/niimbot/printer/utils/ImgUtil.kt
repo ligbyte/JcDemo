@@ -165,7 +165,7 @@ class ImgUtil {
             val bottomBlank = 200
             val welcomeMsgDistance = 100
             //小票菜单标题栏高度+总计金额
-            val receiptCanvasBottomHeight =perLineDistance*7+blackFontHeight*3+ perFontDistance*2+welcomeMsgDistance+normalFontHeight*2+ bottomBlank
+            val receiptCanvasBottomHeight =  perFontDistance * 2 + welcomeMsgDistance + normalFontHeight * 1 + bottomBlank
             //小票高度
             val receiptCanvasHeight =
                 receiptCanvasHeadHeight + receiptCanvasBottomHeight + getProBmpHeight(pros, normalFontHeight, perLineDistance, false)
@@ -315,53 +315,53 @@ class ImgUtil {
             }
             //画线
             canvas.drawLine(0f, y.toFloat(), receiptCanvasWidth.toFloat(), y.toFloat(), paint)
+//
+//
+//            //下面是各种金额
+//            y += perLineDistance * 2
+//            paint.apply {
+//                typeface = Typeface.DEFAULT_BOLD
+//            }
+//
+//            canvas.drawText("店铺实收", 16f, y.toFloat(), paint)
+//            canvas.drawText(
+//                "￥1000",
+//                (receiptCanvasWidth - getFontWidth(paint, "￥1000") - 50).toFloat(),
+//                y.toFloat(),
+//                paint
+//            )
+//
+//            y += blackFontHeight + perLineDistance
+//            canvas.drawText("消费税", 16f, y.toFloat(), paint)
+//            canvas.drawText(
+//                "￥50",
+//                (receiptCanvasWidth - getFontWidth(paint, "￥50") - 50).toFloat(),
+//                y.toFloat(),
+//                paint
+//            )
+//
+//            y += blackFontHeight + perFontDistance
+//            canvas.drawText("服务费", 16f, y.toFloat(), paint)
+//            canvas.drawText(
+//                "￥100",
+//                (receiptCanvasWidth - getFontWidth(paint, "￥100") - 50).toFloat(),
+//                y.toFloat(),
+//                paint
+//            )
+//
+//            y += blackFontHeight + perFontDistance
+//            canvas.drawText("折扣金额", 16f, y.toFloat(), paint)
+//            canvas.drawText(
+//                "-￥100",
+//                (receiptCanvasWidth - getFontWidth(paint, "-￥100") - 50).toFloat(),
+//                y.toFloat(),
+//                paint
+//            )
 
 
-            //下面是各种金额
-            y += perLineDistance * 2
-            paint.apply {
-                typeface = Typeface.DEFAULT_BOLD
-            }
-
-            canvas.drawText("店铺实收", 16f, y.toFloat(), paint)
-            canvas.drawText(
-                "￥1000",
-                (receiptCanvasWidth - getFontWidth(paint, "￥1000") - 50).toFloat(),
-                y.toFloat(),
-                paint
-            )
-
-            y += blackFontHeight + perLineDistance
-            canvas.drawText("消费税", 16f, y.toFloat(), paint)
-            canvas.drawText(
-                "￥50",
-                (receiptCanvasWidth - getFontWidth(paint, "￥50") - 50).toFloat(),
-                y.toFloat(),
-                paint
-            )
-
-            y += blackFontHeight + perFontDistance
-            canvas.drawText("服务费", 16f, y.toFloat(), paint)
-            canvas.drawText(
-                "￥100",
-                (receiptCanvasWidth - getFontWidth(paint, "￥100") - 50).toFloat(),
-                y.toFloat(),
-                paint
-            )
-
-            y += blackFontHeight + perFontDistance
-            canvas.drawText("折扣金额", 16f, y.toFloat(), paint)
-            canvas.drawText(
-                "-￥100",
-                (receiptCanvasWidth - getFontWidth(paint, "-￥100") - 50).toFloat(),
-                y.toFloat(),
-                paint
-            )
-
-
-            //画线
-            y += blackFontHeight + perFontDistance
-            canvas.drawLine(0f, y.toFloat(), receiptCanvasWidth.toFloat(), y.toFloat(), paint)
+//            //画线
+//            y += blackFontHeight + perFontDistance
+//            canvas.drawLine(0f, y.toFloat(), receiptCanvasWidth.toFloat(), y.toFloat(), paint)
 
             paint.apply {
                 textSize = 25f
