@@ -48,6 +48,7 @@ import com.niimbot.printer.utils.BluetoothUtils;
 import com.niimbot.printer.utils.ImgUtil;
 import com.niimbot.printer.utils.PrintUtil;
 import com.permissionx.guolindev.PermissionX;
+import com.wind.dialogtiplib.dialog_tip.TipLoadDialog;
 
 
 import java.util.ArrayList;
@@ -157,7 +158,7 @@ public class PrintActivity extends AppCompatActivity {
     /**
      * 打印进度loading
      */
-    private MyDialogLoadingFragment tipsDialog;
+    public TipLoadDialog tipLoadDialog;
     private ExecutorService executorService;
 
     Handler handler = new Handler(Looper.getMainLooper());
@@ -167,23 +168,10 @@ public class PrintActivity extends AppCompatActivity {
     private Set<String> deviceList;
     private List<BlueDeviceInfo> blueDeviceList;
 
-    private MyDialogWifiSetFragment dialogWifiSetFragment;
 
     private int itemPosition;
     private BlueDeviceInfo lastConnectedDevice;
 
-
-    private TextView tvConnected;
-    private TextView tvName;
-    private TextView tvAddress;
-    private TextView tvStatus;
-
-    private TextView tvWifiConfigure;
-    private ConstraintLayout clConnected;
-
-    private ConstraintLayout clSearch;
-
-    private EditText etModel;
 
     /**
      * 打印机过滤
@@ -219,11 +207,6 @@ public class PrintActivity extends AppCompatActivity {
 
                     @SuppressLint("MissingPermission") boolean supportBluetoothType = device.getType() == BluetoothDevice.DEVICE_TYPE_CLASSIC || device.getType() == BluetoothDevice.DEVICE_TYPE_DUAL;
                     boolean supportPrintName;
-
-
-                    if (USER_DEFINED.equals(printNameStart)) {
-                        printNameStart = etModel.getText().toString().trim();
-                    }
 
                     if (TextUtils.isEmpty(printNameStart)) {
                         supportPrintName = deviceName != null;
@@ -296,7 +279,7 @@ public class PrintActivity extends AppCompatActivity {
     }
 
     private void connectPrinterByPosition(int position) {
-        showLoadingDialog("连接打印机......","CONNECT");
+        showLoadingDialog("连接打印机","CONNECT");
         Log.d(TAG, "limedialog showLoadingDialog: " + 304);
         String[] permissions;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -514,7 +497,7 @@ public class PrintActivity extends AppCompatActivity {
                 } else {
                     //搜索蓝牙
                     runOnUiThread(() -> {
-                        showLoadingDialog("搜索打印机设备中","searching");
+                        showLoadingDialog("搜索打印机中","searching");
                         Log.d(TAG, "limedialog showLoadingDialog: " + 519);
                     });
                     handler.postDelayed(new Runnable() {
@@ -522,9 +505,13 @@ public class PrintActivity extends AppCompatActivity {
                         public void run() {
                             if (!hasDiscoveryBluetooth){
                                 runOnUiThread(() -> {
-                                    Toast.makeText(PrintActivity.this, "请确保打印机设备已开启", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(PrintActivity.this, "请开启打印机", Toast.LENGTH_SHORT).show();
                                     dismissLoadingDialog();
                                     Log.d(TAG, "limedialog dismissLoadingDialog: " + 531);
+//                                    tipLoadDialog.setNoShadowTheme()
+//                                            .setMsgAndType("请开启打印机", TipLoadDialog.ICON_TYPE_FAIL)
+//                                            .setTipTime(3000)
+//                                            .show();
                                 });
                             }
                         }
@@ -563,7 +550,7 @@ public class PrintActivity extends AppCompatActivity {
             @Override
             public void onProgress(int pageIndex, int quantityIndex, HashMap<String, Object> hashMap) {
                 //pageIndex为打印页码进度，quantityIndex为打印份数进度，如第二页第三份
-                handler.post(() -> tipsDialog.setStateStr("打印进度:已打印到第" + pageIndex + "页,第" + quantityIndex + "份"));
+                //handler.post(() -> tipsDialog.setStateStr("打印进度:已打印到第" + pageIndex + "页,第" + quantityIndex + "份"));
                 Log.d(TAG, "测试：打印进度:已打印到第: " + pageIndex);
                 //打印进度回调
                 if (pageIndex == pageCount && quantityIndex == quantity) {
@@ -574,9 +561,10 @@ public class PrintActivity extends AppCompatActivity {
                     } else {
                         Log.d(TAG, "结束打印失败");
                     }
-                    dismissLoadingDialog();
-                    Log.d(TAG, "limedialog dismissLoadingDialog: " + 582);
-                    handlePrintResult(tipsDialog, "打印成功");
+                    //dismissLoadingDialog();
+                    //Log.d(TAG, "limedialog dismissLoadingDialog: " + 582);
+                    //handlePrintResult(tipsDialog, "打印成功");
+                    showLoadingDialog("打印成功","SUCCESS");
                 }
 
 
@@ -593,7 +581,8 @@ public class PrintActivity extends AppCompatActivity {
                 Log.d(TAG, "测试:onError");
                 isError = true;
                 String errorMsg = ERROR_MESSAGES.getOrDefault(errorCode, "");
-                handlePrintResult(tipsDialog, errorMsg);
+                //handlePrintResult(tipsDialog, errorMsg);
+                dismissLoadingDialog();
             }
 
             @Override
@@ -793,15 +782,30 @@ public class PrintActivity extends AppCompatActivity {
     }
 
     private void showLoadingDialog(String msg,String tag) {
-        dismissLoadingDialog();
-        tipsDialog = new MyDialogLoadingFragment(msg);
-        tipsDialog.show(getSupportFragmentManager(), tag);
+        if (tipLoadDialog == null){
+            tipLoadDialog = new TipLoadDialog(this);
+        }
+        if (tag.equals("SUCCESS")){
+            tipLoadDialog.setMsgAndType(msg, TipLoadDialog.ICON_TYPE_SUCCESS)
+                    .setDismissListener(new TipLoadDialog.DismissListener()
+                    {
+                        @Override
+                        public void onDimissListener()
+                        {
+                            //startActivity(new Intent(DialogTipActivity.this, HomeActivity.class));
+                            //然后可以finish掉当前登录页
+                        }
+                    }).show();
+        }else {
+            tipLoadDialog.setNoShadowTheme().setMsgAndType(msg, TipLoadDialog.ICON_TYPE_LOADING2).show();
+        }
+
     }
 
 
     private void dismissLoadingDialog() {
-        if (tipsDialog != null) {
-            tipsDialog.dismiss();
+        if (tipLoadDialog != null) {
+            tipLoadDialog.dismiss();
         }
     }
 

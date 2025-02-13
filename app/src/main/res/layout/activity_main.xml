@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.MainActivity">
+
+
+    <RelativeLayout
+        android:background="@color/purple_700"
+        android:id="@+id/rl"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp54"
+        tools:ignore="MissingConstraints">
+
+
+
+
+        <TextView
+            android:textSize="@dimen/sp16"
+            android:textColor="@color/white"
+            android:text="@string/niimbot_sdk_demo"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+    </RelativeLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dp16"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/rl">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/print_mode" />
+
+
+        <RadioGroup
+            android:id="@+id/rg_print_mode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_thermal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:padding="8dp"
+                android:text="@string/thermal" />
+
+            <RadioButton
+                android:id="@+id/rb_thermal_transfer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/thermal_transfer" />
+
+
+        </RadioGroup>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <Button
+        android:id="@+id/btn_connect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dp16"
+        android:text="@string/connect"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll" />
+
+    <Button
+        android:id="@+id/btn_single_page_print"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dp16"
+        android:text="@string/single_page_print"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_connect" />
+
+    <Button
+        android:id="@+id/btn_multiple_page_print"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dp16"
+        android:text="@string/multiple_page_print"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_single_page_print" />
+
+    <Button
+        android:layout_margin="@dimen/dp16"
+        android:id="@+id/btn_image_print"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/image_print"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_multiple_page_print" />
+
+    <Button
+        android:layout_margin="@dimen/dp16"
+        android:id="@+id/btn_bitmap_print"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/bitmap_print"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_image_print" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

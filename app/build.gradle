@@ -62,4 +62,5 @@ dependencies {
     implementation files('libs/LPAPI-2019-11-20-R.jar')
     implementation files('libs/image-1.8.7.aar')
     implementation files('libs/dialog_lib.aar')
+    implementation files('libs/lib_loadingview.aar')
 }
