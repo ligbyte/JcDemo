@@ -8,7 +8,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.niimbot.jcdemo"
+        applicationId "com.niimbot.printer"
         minSdk 24
         targetSdk 33
         versionCode 1
