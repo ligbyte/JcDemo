@@ -186,6 +186,31 @@ public class PrintActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         isSaveInstanceStateCalled = true;
     }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_print);
+        init();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences preferences = context.getSharedPreferences("printConfiguration", Context.MODE_PRIVATE);
+        printMode = preferences.getInt("printMode", 1);
+        printDensity = preferences.getInt("printDensity", 3);
+        //除B32/Z401/T8的printMultiple为11.81，其他的为8
+        printMultiple = preferences.getFloat("printMultiple", 8.0F);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
+    }
+
+
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
 
@@ -386,17 +411,10 @@ public class PrintActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_print);
-        init();
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
+
+
+
 
     private void init() {
 
@@ -752,22 +770,7 @@ public class PrintActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        SharedPreferences preferences = context.getSharedPreferences("printConfiguration", Context.MODE_PRIVATE);
-        printMode = preferences.getInt("printMode", 1);
-        printDensity = preferences.getInt("printDensity", 3);
-        //除B32/Z401/T8的printMultiple为11.81，其他的为8
-        printMultiple = preferences.getFloat("printMultiple", 8.0F);
 
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(receiver);
-    }
 
     private void showLoadingDialog(String msg,String tag) {
 
